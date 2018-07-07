@@ -5,3 +5,4 @@ coveralls==0.5
 # project
 click==6.6
 SQLAlchemy==1.2.6
+shiftschema==0.1.2
