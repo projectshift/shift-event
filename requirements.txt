@@ -1,0 +1,12 @@
+# cli
+click==6.7
+
+# testing
+rednose==1.2.3
+nose==1.3.7
+Faker==0.8.15
+
+# database
+mysqlclient==1.3.12
+PyMySQL==0.7.11
+SQLAlchemy==1.2.7
