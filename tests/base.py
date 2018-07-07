@@ -37,7 +37,7 @@ class BaseTestCase(unittest.TestCase):
     @property
     def db_path(self):
         """ Path to test database file"""
-        path = os.path.join(os.getcwd(), 'var', 'data', 'events_test.db')
+        path = os.path.join(os.getcwd(), 'var', 'data', 'test.db')
         return path
 
     @property

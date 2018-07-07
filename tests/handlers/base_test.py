@@ -1,4 +1,4 @@
-from shiftevent_tests.base import BaseTestCase
+from tests.base import BaseTestCase
 from nose.plugins.attrib import attr
 
 from shiftevent.handlers import Dummy1
