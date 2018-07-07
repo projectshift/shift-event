@@ -1,0 +1,22 @@
+language: python
+
+# use pythons
+python:
+  - "3.5"
+  - "3.6"
+
+# install dependencies
+install:
+  - pip install -r travis/requirements.txt
+
+# run tests
+script:
+  - nosetests -c travis/nose.ini
+
+# submit coveralls
+after_success:
+  coveralls
+
+notifications:
+  email:
+    - dmitrybelyakov@gmail.com
