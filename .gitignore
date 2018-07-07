@@ -21,12 +21,15 @@ www.esproj
 /man
 
 # Project ignores
-/.coverage
-/config
-/project
-/var/data/*
-!/var/data/.gitkeep
-/migrations
+/var
+
+# build ignores
+/build
+/dist
+/data
+/*.egg-info
+.coverage
+/config.yml
 
 
 
