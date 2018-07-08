@@ -22,7 +22,7 @@ from setuptools import setup, find_packages
 # ----------------------------------------------------------------------------
 
 # project version
-version = '0.0.1'
+version = '0.0.2'
 
 # development status
 # dev_status = '1 - Planning'
@@ -88,7 +88,7 @@ setup(**dict(
 
     # project dependencies
     install_requires=[
-        'shiftschema==0.1.2',
+        'shiftschema==0.1.3',
         'SQLAlchemy==1.2.7'
     ],
 
