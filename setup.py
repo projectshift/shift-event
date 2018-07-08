@@ -51,7 +51,7 @@ setup(**dict(
     name='shiftevent',
     version=version,
     url=repo,
-    download_url=repo + '/archive/v' + version + '.tar.gz',
+    download_url=repo + '/archive/' + version + '.tar.gz',
     description='Simple event store for event-sourced systems',
     keywords=[
         'python3',
