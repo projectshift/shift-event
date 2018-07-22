@@ -16,9 +16,6 @@ class BaseHandler(metaclass=abc.ABCMeta):
     # database instance
     db = None
 
-    # cache service instance
-    cache = None
-
     def __init__(self, db):
         """
         Initializes the handler and gets all required service injected
