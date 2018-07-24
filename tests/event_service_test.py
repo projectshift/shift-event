@@ -32,13 +32,20 @@ class EventServiceTest(BaseTestCase):
     def test_create_event(self):
         """ Creating an event """
         service = EventService(db=self.db)
+
+        payload = {'what': 'IS THIS'}
+        payload_rollback = {'rollback': 'data'}
+
         event = service.event(
             type='DUMMY_EVENT',
             object_id=123,
             author=456,
-            payload={'what': 'IS THIS'},
+            payload=payload,
+            payload_rollback=payload_rollback,
         )
         self.assertEquals(1, event.id)
+        self.assertEquals(payload, event.payload)
+        self.assertEquals(payload_rollback, event.payload_rollback)
 
     def test_raise_on_missing_handler_when_creating_an_event(self):
         """ Raise exception on missing event handler when creating an event"""

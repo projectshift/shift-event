@@ -26,7 +26,13 @@ class EventService:
         self.db = db
         self.handlers = handlers if handlers else default_handlers
 
-    def event(self, type, object_id, author, payload):
+    def event(
+        self,
+        type,
+        object_id,
+        author,
+        payload=None,
+        payload_rollback=None):
         """
         Persist an event
         Creates a new event object, validates it and saves to the database.
@@ -36,6 +42,7 @@ class EventService:
         :param object_id: str, an id of the object being affected
         :param author:  str, author id in external system
         :param payload: dict, event payload
+        :param payload_rollback: dict, payload to roll back an event
         :return: shiftevent.event.Event
         """
         # create
@@ -43,7 +50,8 @@ class EventService:
             type=type,
             author=author,
             object_id=object_id,
-            payload=payload
+            payload=payload,
+            payload_rollback=payload_rollback
         )
 
         # check handler presence
