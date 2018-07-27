@@ -1,9 +1,9 @@
 from shiftevent.handlers import BaseHandler
 
 
-class NoType(BaseHandler):
+class NoTypes(BaseHandler):
     """
-    This handler does not define EVENT_TYPE. It should always fail to
+    This handler does not define EVENT_TYPES. It should always fail to
     instantiate. Used for testing
     """
 

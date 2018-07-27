@@ -11,7 +11,7 @@ class BaseHandler(metaclass=abc.ABCMeta):
     """
 
     # define event type in your concrete implementation
-    EVENT_TYPE = None
+    EVENT_TYPES = ()
 
     # database instance
     db = None
@@ -24,8 +24,8 @@ class BaseHandler(metaclass=abc.ABCMeta):
         self.db = db
 
         # check event type defined
-        if self.EVENT_TYPE is None:
-            msg = 'Event type undefined for handler [{}]'
+        if not self.EVENT_TYPES:
+            msg = 'Event types undefined for handler [{}]'
             raise x.MissingEventType(msg.format(self.__class__))
 
     def check(self, event):
@@ -36,7 +36,7 @@ class BaseHandler(metaclass=abc.ABCMeta):
         :param event: shiftevent.event.Event
         :return: bool
         """
-        if event.type != self.EVENT_TYPE:
+        if event.type not in self.EVENT_TYPES:
             msg = 'Event handler {} can\'t support events of this type ({})'
             raise x.UnsupportedEventType(msg.format(self.__class__, event.type))
 

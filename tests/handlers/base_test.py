@@ -2,7 +2,7 @@ from tests.base import BaseTestCase
 from nose.plugins.attrib import attr
 
 from shiftevent.handlers import Dummy1
-from shiftevent.handlers import NoType
+from shiftevent.handlers import NoTypes
 from shiftevent.event import Event
 from shiftevent import exceptions as x
 
@@ -21,8 +21,8 @@ class BaseHandlerTest(BaseTestCase):
     def test_handler_must_define_event_type(self):
         """ Handlers must define event type """
         with self.assertRaises(x.MissingEventType) as cm:
-            NoType(db=self.db)
-        self.assertIn('Event type undefined for handler', str(cm.exception))
+            NoTypes(db=self.db)
+        self.assertIn('Event types undefined for handler', str(cm.exception))
 
     def test_raise_on_handling_unsaved_event(self):
         """ Raise error when trying to handle unsaved event"""

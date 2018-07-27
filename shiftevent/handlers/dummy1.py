@@ -9,7 +9,9 @@ class Dummy1(BaseHandler):
     as they are immutable.
     """
 
-    EVENT_TYPE = 'DUMMY_EVENT'
+    EVENT_TYPES = (
+        'DUMMY_EVENT',
+    )
 
     def handle(self, event):
         """ Handle event """
