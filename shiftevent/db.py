@@ -15,7 +15,14 @@ class Db:
     _meta = None
     _engine = None
 
-    def __init__(self, db_url=None, engine=None, meta=None, **db_params):
+    def __init__(
+        self,
+        db_url=None,
+        engine=None,
+        meta=None,
+        dialect=None,
+        **db_params
+    ):
         """
         Instantiates database object
         Accepts database URL to connect to the engine  and a dict of db engine
@@ -31,8 +38,10 @@ class Db:
         of your application.
 
         :param db_url: str, database url
-        :param engine: sqalchemy engine
-        :param echo: bool, whether to print queries to console
+        :param engine: sqlachemy engine
+        :param meta: metadata object to attach to, optional
+        :param dialect: str, only required for mysql
+        :param db_params: parameters for engine creation (if not passed in)
         """
         if not db_url and not engine:
             msg = 'Can\'t instantiate database:db_url or engine required'
@@ -42,7 +51,7 @@ class Db:
         self.db_params = db_params
         self._engine = engine
         self._meta = meta
-        self.tables = define_tables(self.meta)
+        self.tables = define_tables(self.meta, dialect=dialect)
 
     @property
     def engine(self):

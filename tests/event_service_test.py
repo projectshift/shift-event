@@ -40,6 +40,17 @@ class EventServiceTest(BaseTestCase):
         )
         self.assertEquals(1, event.id)
 
+    def test_create_unicode_event(self):
+        """ Creating an event with unicode payload"""
+        service = EventService(db=self.db)
+        event = service.event(
+            type='DUMMY_EVENT',
+            object_id=123,
+            author=456,
+            payload={'what': '😂😂😂😂'},
+        )
+        self.assertEquals(1, event.id)
+
     def test_raise_on_missing_handler_when_creating_an_event(self):
         """ Raise exception on missing event handler when creating an event"""
         service = EventService(db=self.db)
@@ -83,7 +94,7 @@ class EventServiceTest(BaseTestCase):
             service.emit(event)
         self.assertIn('has to be a class, got', str(cm.exception))
 
-    def test_raise_when_handler_doesnt_iherit_from_base(self):
+    def test_raise_when_handler_doesnt_inherit_from_base(self):
         """ Raise error when handler does not extend from base """
         class Handler:
             def __init__(self, *args, **kwargs):
