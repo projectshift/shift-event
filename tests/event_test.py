@@ -4,6 +4,8 @@ from nose.plugins.attrib import attr
 from shiftevent.event import Event
 from shiftevent import exceptions as x
 from datetime import datetime
+import json
+from pprint import pprint as pp
 
 
 @attr('event')
@@ -89,11 +91,28 @@ class EventTest(BaseTestCase):
             event.payload = 'no-a-json-string'
         self.assertIn('Failed to decode payload string', str(cm.exception))
 
+    def test_setting_event_payload_as_json(self):
+        """ Setting event payload as json string """
+        event = Event(payload=json.dumps(dict(something='else')))
+        self.assertTrue(type(event.payload) is dict)
+
     def test_getting_event_payload(self):
         """ Getting event payload """
-        data = dict(some='payload_goes_here')
+        data = json.dumps(dict(some='payload_goes_here'))
         event = Event(payload=data)
         self.assertTrue(type(event.payload) is dict)
+
+    def test_getting_event_payload_as_json_string(self):
+        """ Getting payload as json string """
+        data = json.dumps(dict(some='payload_goes_here'))
+        event = Event(payload=data)
+        self.assertTrue(type(event.payload_json) is str)
+        self.assertEquals(data, event.payload_json)
+
+    def test_setting_event_rollback_payload_as_json(self):
+        """ Setting event rollback payload as json string """
+        event = Event(payload_rollback=json.dumps(dict(something='else')))
+        self.assertTrue(type(event.payload_rollback) is dict)
 
     def test_getting_event_payload_rollback(self):
         """ Getting event rollback payload """
@@ -101,3 +120,9 @@ class EventTest(BaseTestCase):
         event = Event(payload_rollback=data)
         self.assertTrue(type(event.payload_rollback) is dict)
 
+    def test_getting_rollback_payload_as_json_string(self):
+        """ Getting rollback payload as json string """
+        data = json.dumps(dict(some='payload_goes_here'))
+        event = Event(payload_rollback=data)
+        self.assertTrue(type(event.payload_rollback_json) is str)
+        self.assertEquals(data, event.payload_rollback_json)

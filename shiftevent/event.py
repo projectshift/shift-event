@@ -91,7 +91,7 @@ class Event:
         """ Overrides attribute access for setting props """
         if key == 'payload':
             self.set_payload(value)
-        if key == 'payload_rollback':
+        elif key == 'payload_rollback':
             self.set_payload_rollback(value)
         elif key in self.props:
             self.props[key] = value
@@ -100,12 +100,32 @@ class Event:
             object.__setattr__(self, key, value)
         return self
 
+    @property
+    def payload_json(self):
+        """
+        Payload json
+        Returns payload as a json string
+        :return: str
+        """
+        payload = self.payload if self.payload else {}
+        return json.dumps(payload, ensure_ascii=False)
+
+    @property
+    def payload_rollback_json(self):
+        """
+        Payload rollback json
+        Returns rollback payload as a json string
+        :return: str
+        """
+        payload = self.payload_rollback if self.payload_rollback else {}
+        return json.dumps(payload, ensure_ascii=False)
+
     def set_payload(self, payload):
         """
         Set payload
         Accepts a dictionary and encodes it into a json string for persistence.
         Will raise an exception if payload is not a dictionary.
-        :param payload: dict
+        :param payload: dict or json string
         :return:
         """
         if type(payload) is str:
@@ -125,7 +145,7 @@ class Event:
         Set rollback payload
         Accepts a dictionary and encodes it into a json string for persistence.
         Will raise an exception if payload is not a dictionary.
-        :param payload: dict
+        :param payload: dict or json string
         :return:
         """
         if type(payload) is str:
@@ -152,14 +172,8 @@ class Event:
         :return:
         """
         data = self.to_dict()
-        data['payload'] = json.dumps(
-            data['payload'],
-            ensure_ascii=False
-        )
-        data['payload_rollback'] = json.dumps(
-            data['payload_rollback'],
-            ensure_ascii=False
-        )
+        data['payload'] = self.payload_json
+        data['payload_rollback'] = self.payload_rollback_json
         return data
 
     def from_dict(self, data):
