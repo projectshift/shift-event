@@ -13,6 +13,13 @@ class BaseHandlerTest(BaseTestCase):
     Base event handler test. Since it's abstract we're gonna test it through
     a concrete implementations.
     """
+
+    def test_can_accept_custom_context(self):
+        """ Handlers can have optional context with dependencies """
+        context = dict(dependency='I am a dependency, like some service')
+        handler = Dummy1(context=context)
+        self.assertEquals(context, handler.context)
+
     def test_handler_must_define_event_type(self):
         """ Handlers must define event type """
         with self.assertRaises(x.MissingEventType) as cm:

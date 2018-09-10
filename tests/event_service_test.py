@@ -151,6 +151,26 @@ class EventServiceTest(BaseTestCase):
         self.assertIn('dummy_handler1', processed.payload)
         self.assertIn('dummy_handler2', processed.payload)
 
+    def test_handlers_onstantiated_with_context_if_set(self):
+        """ Event service passes dependency context to handlers if configured"""
+        handler = Dummy2
+        handler.__init__ = MagicMock(return_value=None)
+
+
+        context = dict(dependency='Some dependency')
+        service = EventService(db=self.db, handler_context=context)
+        service.handlers['DUMMY_EVENT'].append(handler)
+
+        event = service.event(
+            type='DUMMY_EVENT',
+            object_id=123,
+            author=456,
+            payload={'what': 'IS THIS'}
+        )
+
+        service.emit(event)
+        handler.__init__.assert_called_with(context=context)
+
     def test_rollback_handlers_on_exception(self):
         """ Rollback applied handlers on handler exceptions """
 

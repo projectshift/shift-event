@@ -17,14 +17,20 @@ class EventService:
     # event handlers
     handlers = None
 
-    def __init__(self, db, handlers=None):
+    # context for handlers
+    handler_context = None
+
+    def __init__(self, db, handlers=None, handler_context=None):
         """
         Initialize event service
         Accepts a database instance to operate on events and projections.
-        :param db:
+        :param db: shiftevent.db.Db, database instance
+        :param handlers: dict, optional handlers configuration
+        :param context: dict, context to pass to handlers
         """
         self.db = db
         self.handlers = handlers if handlers else default_handlers
+        self.handler_context = handler_context
 
     def event(
         self,
@@ -98,7 +104,7 @@ class EventService:
                     type(handler)
                 ))
 
-            handler = handler()
+            handler = handler(context=self.handler_context)
             if not isinstance(handler, BaseHandler):
                 msg = 'Handler implementations must extend BaseHandler'
                 raise x.HandlerInstantiationError(msg)
@@ -133,7 +139,7 @@ class EventService:
                         events.c.id == event.id
                     ))
 
-                # now re-raise the exception
+                # re-raise the exception
                 raise handler_exception
 
         # return event at the end
