@@ -1,11 +1,16 @@
 from tests.base import BaseTestCase
 from nose.plugins.attrib import attr
+from unittest.mock import MagicMock
 
 from pprint import pprint as pp
+from inspect import isclass
 from shiftevent import exceptions as x
 from shiftevent.event_service import EventService
 from shiftevent.event import Event
 from shiftevent.handlers import Dummy1
+from shiftevent.handlers import Dummy2
+from shiftevent.handlers import Dummy3
+from shiftevent.handlers import Dummy4
 
 
 @attr('event', 'service')
@@ -146,8 +151,69 @@ class EventServiceTest(BaseTestCase):
         self.assertIn('dummy_handler1', processed.payload)
         self.assertIn('dummy_handler2', processed.payload)
 
+    def test_rollback_handlers_on_exception(self):
+        """ Rollback applied handlers on handler exceptions """
 
+        # create event
+        service = EventService(db=self.db)
+        event = service.event(
+            type='DUMMY_EVENT',
+            object_id=123,
+            author=456,
+            payload={'what': 'IS THIS'}
+        )
 
+        # create handlers
+        handler1 = Dummy1
+        handler1.handle = MagicMock(return_value=event)
+        handler1.rollback = MagicMock(return_value=event)
+
+        handler2 = Dummy2
+        handler2.handle = MagicMock(return_value=event)
+        handler2.rollback = MagicMock(return_value=event)
+
+        handler3 = Dummy3
+        handler3.handle = MagicMock(side_effect=Exception('Handler exception'))
+        handler3.rollback = MagicMock(return_value=event)
+
+        handler4 = Dummy4
+        handler4.handle = MagicMock(return_value=event)
+        handler4.rollback = MagicMock(return_value=event)
+
+        # attach to service
+        service.handlers = dict(
+            # dummy handlers
+            DUMMY_EVENT=[
+                handler1,
+                handler2,
+                handler3,
+                handler4,
+            ],
+        )
+
+        # assert raised
+        with self.assertRaises(Exception) as cm:
+            service.emit(event)
+        self.assertIn('Handler exception', str(cm.exception))
+
+        # assert first handlers ran
+        handler1.handle.assert_called_with(event)
+        handler2.handle.assert_called_with(event)
+        handler3.handle.assert_called_with(event)
+
+        # assert handlers after the exception weren't called
+        handler4.handle.assert_not_called()
+
+        # assert handlers before exception rolled back
+        handler1.rollback.assert_called_with(event)
+        handler2.rollback.assert_called_with(event)
+        handler3.rollback.assert_called_with(event)
+
+        # assert handlers after the exception not called
+        handler4.rollback.assert_not_called()
+
+        # assert event dropped from the store
+        self.assertIsNone(service.get_event(event.id))
 
 
 

@@ -107,12 +107,34 @@ class EventService:
             chain.append(handler)
 
         # all valid? run chain
+        ran = []
         for handler in chain:
-            handled = handler.handle_event(event)
-            if handled:
-                event = handled
-            else:
-                break  # skip next handler
+            try:
+                ran.append(handler)
+                handled = handler.handle_event(event)
+                if handled:
+                    event = handled
+                else:
+                    break  # skip next handler
+            except Exception as handler_exception:
+
+                # first, reverse all handlers that ran
+                for handler in ran:
+                    handled = handler.rollback_event(event)
+                    if handled:
+                        event = handled
+                    else:
+                        break  # skip next handler
+
+                # drop event from the store
+                events = self.db.tables['events']
+                with self.db.engine.begin() as conn:
+                    conn.execute(events.delete().where(
+                        events.c.id == event.id
+                    ))
+
+                # now re-raise the exception
+                raise handler_exception
 
         # return event at the end
         return event
