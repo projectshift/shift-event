@@ -94,7 +94,7 @@ class EventServiceTest(BaseTestCase):
 
     def test_raise_when_handler_not_defined_as_a_class(self):
         """ Raise an error when handler is not a class """
-        handler_definitions = dict(DUMMY_EVENT=[Dummy1(db=self.db)])
+        handler_definitions = dict(DUMMY_EVENT=[Dummy1()])
         service = EventService(db=self.db, handlers=handler_definitions)
         event = Event(type='DUMMY_EVENT', id=123, payload=dict(some='payload'))
         with self.assertRaises(x.HandlerInstantiationError) as cm:

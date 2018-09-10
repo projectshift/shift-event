@@ -10,12 +10,12 @@ class Dummy1Test(BaseTestCase):
 
     def test_instantiating_handler(self):
         """ Instantiating dummy1 handler """
-        handler = Dummy1(self.db)
+        handler = Dummy1()
         self.assertIsInstance(handler, Dummy1)
 
     def test_handle_event(self):
         """ Handler Dummy1 handles event"""
-        handler = Dummy1(self.db)
+        handler = Dummy1()
         event = Event(
             type='DUMMY_EVENT',
             payload={'prop': 'val'}
@@ -26,7 +26,7 @@ class Dummy1Test(BaseTestCase):
 
     def test_rollback_event(self):
         """ Handler Dummy1 rolling back an event """
-        handler = Dummy1(self.db)
+        handler = Dummy1()
         event = Event(
             type='DUMMY_EVENT',
             payload={'prop': 'val'}

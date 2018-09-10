@@ -98,7 +98,7 @@ class EventService:
                     type(handler)
                 ))
 
-            handler = handler(db=self.db)
+            handler = handler()
             if not isinstance(handler, BaseHandler):
                 msg = 'Handler implementations must extend BaseHandler'
                 raise x.HandlerInstantiationError(msg)

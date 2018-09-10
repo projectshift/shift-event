@@ -13,16 +13,11 @@ class BaseHandler(metaclass=abc.ABCMeta):
     # define event type in your concrete implementation
     EVENT_TYPES = ()
 
-    # database instance
-    db = None
-
-    def __init__(self, db):
+    def __init__(self):
         """
         Initializes the handler and gets all required service injected
         :param db: shiftevent.db.Db
         """
-        self.db = db
-
         # check event type defined
         if not self.EVENT_TYPES:
             msg = 'Event types undefined for handler [{}]'
