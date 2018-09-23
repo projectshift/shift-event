@@ -35,8 +35,8 @@ class EventService:
     def event(
         self,
         type,
-        object_id,
         author,
+        object_id=None,
         payload=None,
         payload_rollback=None):
         """
@@ -45,8 +45,8 @@ class EventService:
         May throw a validation exception if some event data is invalid.
 
         :param type: str, event type
-        :param object_id: str, an id of the object being affected
         :param author:  str, author id in external system
+        :param object_id: str, an id of the object being affected
         :param payload: dict, event payload
         :param payload_rollback: dict, payload to roll back an event
         :return: shiftevent.event.Event
