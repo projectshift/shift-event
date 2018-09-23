@@ -27,9 +27,6 @@ class EventSchema(Schema):
 
         self.add_property('object_id')
         self.object_id.add_filter(filters.Strip())
-        self.object_id.add_validator(validators.Required(
-            message='An event must have an object id'
-        ))
 
         self.add_property('author')
         self.author.add_filter(filters.Strip())
