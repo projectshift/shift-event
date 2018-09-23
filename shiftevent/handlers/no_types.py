@@ -7,11 +7,11 @@ class NoTypes(BaseHandler):
     instantiate. Used for testing
     """
 
-    def handle(self, event):
+    def handle(self, event):  # pragma: no cover
         """ Handle event """
         pass
 
-    def rollback(self, event):
+    def rollback(self, event):  # pragma: no cover
         """ Rollback event """
         pass
 

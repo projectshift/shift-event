@@ -52,17 +52,6 @@ class EventServiceTest(BaseTestCase):
         self.assertEquals(payload, event.payload)
         self.assertEquals(payload_rollback, event.payload_rollback)
 
-    def test_create_unicode_event(self):
-        """ Creating an event with unicode payload"""
-        service = EventService(db=self.db)
-        event = service.event(
-            type='DUMMY_EVENT',
-            object_id=123,
-            author=456,
-            payload={'what': '😂😂😂😂'},
-        )
-        self.assertEquals(1, event.id)
-
     def test_raise_on_missing_handler_when_creating_an_event(self):
         """ Raise exception on missing event handler when creating an event"""
         service = EventService(db=self.db)
@@ -73,6 +62,45 @@ class EventServiceTest(BaseTestCase):
                 author=456,
                 payload={'what': 'IS THIS'}
             )
+
+    def test_save_an_event(self):
+        """ Saving an event """
+        event = Event(
+            type='DUMMY_EVENT',
+            object_id=123,
+            author=123,
+            payload={'body': 'I am the payload 😂'},
+            payload_rollback={'body': 'I am rollback payload 😂'},
+        )
+
+        service = EventService(db=self.db)
+        service.save_event(event)
+        self.assertEquals(1, event.id)
+
+    def test_raise_exception_on_saving_event_with_no_handlers(self):
+        """ Raise when saving event with no handlers """
+        event = Event(
+            type='UNKNOWN_EVENT_TYPE',
+            object_id=123,
+            author=456,
+            payload={'what': 'IS THIS'}
+        )
+        with self.assertRaises(x.EventError):
+            service = EventService(db=self.db)
+            service.save_event(event)
+
+    def test_raise_exception_on_saving_invalid_event(self):
+        """ Raise exception when saving invalid event """
+        event = Event(
+            type='DUMMY_EVENT',
+            object_id=123,
+            payload={'body': 'I am the payload 😂'},
+            payload_rollback={'body': 'I am rollback payload 😂'},
+        )
+        with self.assertRaises(x.InvalidEvent) as cm:
+            service = EventService(db=self.db)
+            service.save_event(event)
+        self.assertIn('author', cm.exception.validation_errors)
 
     def test_get_event_by_id(self):
         """ Getting event by id"""
@@ -151,11 +179,10 @@ class EventServiceTest(BaseTestCase):
         self.assertIn('dummy_handler1', processed.payload)
         self.assertIn('dummy_handler2', processed.payload)
 
-    def test_handlers_onstantiated_with_context_if_set(self):
+    def test_handlers_instantiated_with_context_if_set(self):
         """ Event service passes dependency context to handlers if configured"""
         handler = Dummy2
         handler.__init__ = MagicMock(return_value=None)
-
 
         context = dict(dependency='Some dependency')
         service = EventService(db=self.db, handler_context=context)

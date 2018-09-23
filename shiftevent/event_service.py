@@ -60,25 +60,7 @@ class EventService:
             payload_rollback=payload_rollback
         )
 
-        # check handler presence
-        if type not in self.handlers:
-            msg = 'No handlers for event of type [{}]'
-            raise x.EventError(msg.format(type))
-
-        # validate
-        schema = EventSchema()
-        ok = schema.process(event)
-        if not ok:
-            raise x.InvalidEvent(validation_errors=ok.get_messages())
-
-        # and save
-        events = self.db.tables['events']
-        with self.db.engine.begin() as conn:
-            data = event.to_db()
-            del data['id']
-            result = conn.execute(events.insert(), **data)
-            event.id = result.inserted_primary_key[0]
-
+        event = self.save_event(event)
         return event
 
     def emit(self, event):
@@ -129,8 +111,6 @@ class EventService:
                     handled = handler.rollback_event(event)
                     if handled:
                         event = handled
-                    else:
-                        break  # skip next handler
 
                 # drop event from the store
                 events = self.db.tables['events']
@@ -143,6 +123,34 @@ class EventService:
                 raise handler_exception
 
         # return event at the end
+        return event
+
+    def save_event(self, event):
+        """
+        Save event
+        Validates and persist event object. This should only get run
+        to persist and event after all the handlers ran.
+
+        :param event: shiftevent.event.Event
+        :return: shiftevent.event.Event
+        """
+        if event.type not in self.handlers:
+            raise x.EventError('No handlers for event {}'.format(event.type))
+
+        # validate
+        schema = EventSchema()
+        ok = schema.process(event)
+        if not ok:
+            raise x.InvalidEvent(validation_errors=ok.get_messages())
+
+        # and save
+        events = self.db.tables['events']
+        with self.db.engine.begin() as conn:
+            data = event.to_db()
+            del data['id']
+            result = conn.execute(events.insert(), **data)
+            event.id = result.inserted_primary_key[0]
+
         return event
 
     def get_event(self, id):
