@@ -11,6 +11,7 @@ from shiftevent.handlers import Dummy1
 from shiftevent.handlers import Dummy2
 from shiftevent.handlers import Dummy3
 from shiftevent.handlers import Dummy4
+from pprint import pprint as pp
 
 
 @attr('event', 'service')
@@ -63,8 +64,8 @@ class EventServiceTest(BaseTestCase):
                 payload={'what': 'IS THIS'}
             )
 
-    def test_save_an_event(self):
-        """ Saving an event """
+    def test_save_inserts_an_event(self):
+        """ Save event can insert a new event """
         event = Event(
             type='DUMMY_EVENT',
             object_id=123,
@@ -76,6 +77,44 @@ class EventServiceTest(BaseTestCase):
         service = EventService(db=self.db)
         service.save_event(event)
         self.assertEquals(1, event.id)
+
+    def test_save_can_update_existing_event(self):
+        """ Save event can update existing event """
+        service = EventService(db=self.db)
+
+        # create first
+        event = Event(
+            type='DUMMY_EVENT',
+            object_id=123,
+            author=123,
+            payload={'body': 'I am the payload 😂'},
+            payload_rollback={'body': 'I am rollback payload 😂'},
+        )
+        service.save_event(event)
+
+        # now update
+        event = service.get_event(event.id)
+        event.payload = {'body': 'I am updated body 👻'}
+        event = service.save_event(event)
+        self.assertEquals('I am updated body 👻', event.payload['body'])
+        self.assertEquals(1, event.id)
+
+    def test_save_skips_updates_on_nonexistent_items(self):
+        """ Save event method silently skips when updating nonexistent item """
+        service = EventService(db=self.db)
+
+        event = Event(
+            id=456,
+            type='DUMMY_EVENT',
+            object_id=123,
+            author=123,
+            payload={'body': 'I am the payload 😂'},
+            payload_rollback={'body': 'I am rollback payload 😂'},
+        )
+
+        service.save_event(event)
+        found = service.get_event(id=456)
+        self.assertIsNone(found)
 
     def test_raise_exception_on_saving_event_with_no_handlers(self):
         """ Raise when saving event with no handlers """

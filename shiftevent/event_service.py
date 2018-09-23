@@ -3,6 +3,7 @@ from shiftevent.event import Event, EventSchema
 from shiftevent import exceptions as x
 from shiftevent.default_handlers import default_handlers
 from shiftevent.handlers import BaseHandler
+from pprint import pprint as pp
 
 
 class EventService:
@@ -146,10 +147,19 @@ class EventService:
         # and save
         events = self.db.tables['events']
         with self.db.engine.begin() as conn:
+
             data = event.to_db()
             del data['id']
-            result = conn.execute(events.insert(), **data)
-            event.id = result.inserted_primary_key[0]
+
+            # insert
+            if not event.id:
+                result = conn.execute(events.insert(), **data)
+                event.id = result.inserted_primary_key[0]
+
+            # update
+            else:
+                query = events.update().where(events.c.id == event.id)
+                result = conn.execute(query.values(**data))
 
         return event
 
