@@ -121,7 +121,13 @@ class EventServiceTest(BaseTestCase):
         """ Instantiating handler """
         handler_definitions = dict(DUMMY_EVENT=[Dummy1])
         service = EventService(db=self.db, handlers=handler_definitions)
-        event = Event(type='DUMMY_EVENT', id=123, payload=dict(some='payload'))
+        event = Event(
+            type='DUMMY_EVENT',
+            id=123,
+            author=123,
+            payload=dict(some='payload')
+        )
+
         event = service.emit(event)
         self.assertIn('dummy_handler1', event.payload)
 
